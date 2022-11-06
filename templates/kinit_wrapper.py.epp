@@ -13,9 +13,9 @@ child.sendline(password)
 child.wait()
 
 if child.exitstatus == 0:
-    print 'Success: kinit succeeded'
+    print('Success: kinit succeeded')
     sys.exit(0)
 
 else:
-    print 'Error: kinit failed'
+    print('Error: kinit failed')
     sys.exit(1)
