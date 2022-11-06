@@ -2,6 +2,7 @@
 class central_auth::config (
   # Class parameters are populated from External(hiera)/Defaults/Fail
   Optional[String] $ad_gpo_access_control,
+  Optional[String] $ad_gpo_map_remote_interactive,
   String $default_domain             = '',
   String $admin_server               = lookup( 'central_auth::config::default_domain', String, 'first', '' ),
   String $ad_domain                  = '',

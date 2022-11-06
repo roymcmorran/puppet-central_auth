@@ -21,6 +21,9 @@ ad_backup_server = <%= $ad_backup_server %>
 <% if !empty($ad_gpo_access_control ) { -%>
 ad_gpo_access_control  = <%= $ad_gpo_access_control  %>
 <% } -%>
+<% if !empty($ad_gpo_map_remote_interactive ) { -%>
+ad_gpo_map_remote_interactive  = <%= $ad_gpo_map_remote_interactive  %>
+<% } -%>
 ad_hostname = <%= $host_fqdn.downcase %>
 <% if !empty($timeout) { -%>
 timeout = <%= $timeout %>
