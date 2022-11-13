@@ -1,6 +1,6 @@
 #!/bin/bash
 # Use the host keytab to renew the cached "krbtgt/" principle for the host
-HOSTFULLNAME=`uname -n|tr [a-z] [A-Z]`
+HOSTFULLNAME=`uname -n|tr '[:lower:]' '[:upper:]'`
 HOSTSHORTNAME=${HOSTFULLNAME%%.*}
 output="$(kinit -v -kt /etc/krb5.keytab -c /tmp/krb5cc_0 "${HOSTSHORTNAME}$" 2>&1)"
 if [ $? -eq 0 ] ; then
