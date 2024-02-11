@@ -22,6 +22,7 @@ class central_auth::config (
   Integer $dyndns_refresh_interval   = 43200,
   Boolean $dyndns_update_ptr         = true,
   Integer $dyndns_ttl                = 3600,
+  Boolean $manage_nsswitch           = true,
 
   Integer $ldap_idmap_range_size     = 200000,
   Boolean $ldap_id_mapping           = false,
@@ -40,7 +41,6 @@ class central_auth::config (
 
   String $smb_template               = 'central_auth/smb.conf',
 ) {
-
   File {
     owner => 'root',
     group => 'root',
@@ -53,7 +53,7 @@ class central_auth::config (
       $sssd_template = 'central_auth/sssd.conf.AD_LDAP'
     } elsif $directory_type == 'openldap' {
       $sssd_template = 'central_auth/sssd.conf.OPENLDAP'
-    } else{
+    } else {
         fail("Unknown directory type: ${directory_type}")
     }
   } else {
@@ -61,9 +61,7 @@ class central_auth::config (
   }
   $krb5_template = 'central_auth/krb5.conf.AD'
 
-
   if $central_auth::enable_sssd {
-
     if ! $default_domain {
       fail('The default domain cannot be empty: central_auth::config::default_domain')
     }
@@ -81,7 +79,7 @@ class central_auth::config (
                                         ticket_lifetime  => $ticket_lifetime,
                                         renew_lifetime   => $renew_lifetime,
                                         forwardable      => $forwardable,
-                                      } ),
+                                      }),
         notify  => Service['sssd'],
       }
 
@@ -132,7 +130,6 @@ class central_auth::config (
           value   => $passwd_servers.join(' '),
         }
       }
-
     }
 
     file { '/etc/sssd':
@@ -182,7 +179,7 @@ class central_auth::config (
                                       dyndns_refresh_interval       => $dyndns_refresh_interval,
                                       dyndns_update_ptr             => $dyndns_update_ptr,
                                       dyndns_ttl                    => $dyndns_ttl,
-                                    } ),
+                                    }),
       mode    => '0600',
       notify  => Exec['clean_sssd_cache.sh'],
     }
@@ -195,10 +192,12 @@ class central_auth::config (
       }
     }
 
-    file { '/etc/nsswitch.conf':
-      ensure  => file,
-      content => epp('central_auth/nsswitch.conf'),
-      require => File['/etc/sssd/sssd.conf'],
+    if $manage_nsswitch {
+      file { '/etc/nsswitch.conf':
+        ensure  => file,
+        content => epp('central_auth/nsswitch.conf'),
+        require => File['/etc/sssd/sssd.conf'],
+      }
     }
 
     # Set the authconfig settings to reflect what we are setting - even though authconfig is not being used
@@ -213,5 +212,4 @@ class central_auth::config (
       }
     }
   }
-
 }
