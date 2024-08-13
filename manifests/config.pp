@@ -9,6 +9,7 @@ class central_auth::config (
   String $ad_server                  = '',
   String $ad_backup_server           = '',
   String $ad_site_name               = '',
+  Optional[String] $workgroup,
   Integer $service_ping_timeout      = 60,
   String $default_realm              = lookup( 'central_auth::config::default_domain', String, 'first', '' ),
   Collection $passwd_servers         = [],
@@ -87,8 +88,10 @@ class central_auth::config (
         ensure  => directory,
       }
 
-      $dr_arr = split($default_realm, '\.')
-      $addomain = $dr_arr[0]
+      if ! defined($workgroup) {
+        # reckless assumption
+        $workgroup = split($default_realm, '\.')[0].upcase
+      }
       #file { '/etc/samba/smb.conf':
       #ensure  => file,
       #content => epp($smb_template, { default_realm => $default_realm, addomain => $addomain }),
@@ -105,7 +108,7 @@ class central_auth::config (
         path    => '/etc/samba/smb.conf',
         section => 'global',
         setting => 'workgroup',
-        value   => $addomain.upcase,
+        value   => $workgroup.upcase,
       }
       ini_setting { 'smb realm':
         ensure  => present,
