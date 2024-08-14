@@ -88,9 +88,11 @@ class central_auth::config (
         ensure  => directory,
       }
 
-      if ! defined($workgroup) {
+      if defined($workgroup) {
+        $wg = $workgroup
+      } else {
         # reckless assumption
-        $workgroup = split($default_realm, '\.')[0].upcase
+        $wg = split($default_realm, '\.')[0].upcase
       }
       #file { '/etc/samba/smb.conf':
       #ensure  => file,
@@ -108,7 +110,7 @@ class central_auth::config (
         path    => '/etc/samba/smb.conf',
         section => 'global',
         setting => 'workgroup',
-        value   => $workgroup.upcase,
+        value   => $wg.upcase,
       }
       ini_setting { 'smb realm':
         ensure  => present,
