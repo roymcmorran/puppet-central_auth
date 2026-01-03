@@ -48,8 +48,8 @@ class central_auth::config (
     mode  => '0644',
   }
 
-  if ( $::osfamily == 'Suse' and ($::operatingsystemmajrelease + 0) < 12 )
-    or ( $facts['os']['name'] == 'Ubuntu' and ($::operatingsystemmajrelease + 0) < 13 ) {
+  if ( $::osfamily == 'Suse' and Integer($::operatingsystemmajrelease) < 12 )
+    or ( $facts['os']['name'] == 'Ubuntu' and Integer($::operatingsystemmajrelease) < 13 ) {
     if $directory_type == 'ad' {
       $sssd_template = 'central_auth/sssd.conf.AD_LDAP'
     } elsif $directory_type == 'openldap' {

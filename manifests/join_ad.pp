@@ -39,7 +39,7 @@ class central_auth::join_ad (
     }
 
     # Run kinit command
-    if ( $::osfamily == 'RedHat' and ($::operatingsystemmajrelease + 0) > 6 ) {
+    if ( $::osfamily == 'RedHat' and Integer($::operatingsystemmajrelease) > 6 ) {
       exec { 'net join':
         path        => '/usr/bin:/usr/sbin:/bin:/sbin',
         unless      => "/sbin/adcli testjoin --domain=${default_domain} >/dev/null 2>&1",
