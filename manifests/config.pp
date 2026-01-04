@@ -85,7 +85,7 @@ class central_auth::config (
       }
 
       file { '/etc/samba':
-        ensure  => directory,
+        ensure => directory,
       }
 
       if $workgroup {
