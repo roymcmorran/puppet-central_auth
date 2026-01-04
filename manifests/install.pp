@@ -13,7 +13,7 @@ class central_auth::install (
 
   if $central_auth::enable_sssd {
     file { $clean_sssd_cache_script:
-      ensure => 'present',
+      ensure => file,
       owner  => 'root',
       group  => 'root',
       mode   => '0775',

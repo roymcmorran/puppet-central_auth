@@ -48,14 +48,14 @@ class central_auth::config (
     mode  => '0644',
   }
 
-  if ( $::osfamily == 'Suse' and Integer($::operatingsystemmajrelease) < 12 )
-    or ( $facts['os']['name'] == 'Ubuntu' and Integer($::operatingsystemmajrelease) < 13 ) {
+  if ( $facts['os']['family'] == 'Suse' and Integer($facts['os']['release']['major']) < 12 )
+  or ( $facts['os']['name'] == 'Ubuntu' and Integer($facts['os']['release']['major']) < 13 ) {
     if $directory_type == 'ad' {
       $sssd_template = 'central_auth/sssd.conf.AD_LDAP'
     } elsif $directory_type == 'openldap' {
       $sssd_template = 'central_auth/sssd.conf.OPENLDAP'
     } else {
-        fail("Unknown directory type: ${directory_type}")
+      fail("Unknown directory type: ${directory_type}")
     }
   } else {
     $sssd_template = 'central_auth/sssd.conf.AD'
@@ -72,15 +72,15 @@ class central_auth::config (
       file { '/etc/krb5.conf':
         ensure  => file,
         content => epp($krb5_template, {
-                                        admin_server     => $admin_server,
-                                        default_domain   => $default_domain,
-                                        default_realm    => $default_realm,
-                                        dns_lookup_realm => $dns_lookup_realm,
-                                        dns_lookup_kdc   => $dns_lookup_kdc,
-                                        ticket_lifetime  => $ticket_lifetime,
-                                        renew_lifetime   => $renew_lifetime,
-                                        forwardable      => $forwardable,
-                                      }),
+            admin_server     => $admin_server,
+            default_domain   => $default_domain,
+            default_realm    => $default_realm,
+            dns_lookup_realm => $dns_lookup_realm,
+            dns_lookup_kdc   => $dns_lookup_kdc,
+            ticket_lifetime  => $ticket_lifetime,
+            renew_lifetime   => $renew_lifetime,
+            forwardable      => $forwardable,
+        }),
         notify  => Service['sssd'],
       }
 
@@ -153,40 +153,40 @@ class central_auth::config (
     file { '/etc/sssd/sssd.conf':
       ensure  => file,
       content => epp($sssd_template, {
-                                      default_domain                => $default_domain,
-                                      admin_server                  => $admin_server,
-                                      ad_domain                     => $ad_domain,
-                                      ad_server                     => $ad_server,
-                                      ad_backup_server              => $ad_backup_server,
-                                      ad_gpo_access_control         => $ad_gpo_access_control,
-                                      ad_gpo_map_remote_interactive => $ad_gpo_map_remote_interactive,
-                                      host_fqdn                     => $facts['fqdn'],
-                                      ad_site_name                  => $ad_site_name,
-                                      timeout                       => $service_ping_timeout,
-                                      ldap_idmap_range_size         => $ldap_idmap_range_size,
-                                      ldap_id_mapping               => $ldap_id_mapping,
-                                      ldap_tls_cacert               => $ldap_tls_cacert,
-                                      cache_credentials             => $cache_credentials,
-                                      case_sensitive                => $case_sensitive,
-                                      override_shell                => $override_shell,
-                                      override_homedir              => $override_homedir,
-                                      debug_level                   => $sssd_debug_level,
-                                      ldap_uri                      => $ldap_uri,
-                                      user_ou_path                  => $user_ou_path,
-                                      group_ou_path                 => $group_ou_path,
-                                      bind_user                     => $bind_user,
-                                      bind_pass                     => $bind_pass,
-                                      dc                            => $dc,
-                                      dyndns_update                 => $dyndns_update,
-                                      dyndns_refresh_interval       => $dyndns_refresh_interval,
-                                      dyndns_update_ptr             => $dyndns_update_ptr,
-                                      dyndns_ttl                    => $dyndns_ttl,
-                                    }),
+          default_domain                => $default_domain,
+          admin_server                  => $admin_server,
+          ad_domain                     => $ad_domain,
+          ad_server                     => $ad_server,
+          ad_backup_server              => $ad_backup_server,
+          ad_gpo_access_control         => $ad_gpo_access_control,
+          ad_gpo_map_remote_interactive => $ad_gpo_map_remote_interactive,
+          host_fqdn                     => $facts['networking']['fqdn'],
+          ad_site_name                  => $ad_site_name,
+          timeout                       => $service_ping_timeout,
+          ldap_idmap_range_size         => $ldap_idmap_range_size,
+          ldap_id_mapping               => $ldap_id_mapping,
+          ldap_tls_cacert               => $ldap_tls_cacert,
+          cache_credentials             => $cache_credentials,
+          case_sensitive                => $case_sensitive,
+          override_shell                => $override_shell,
+          override_homedir              => $override_homedir,
+          debug_level                   => $sssd_debug_level,
+          ldap_uri                      => $ldap_uri,
+          user_ou_path                  => $user_ou_path,
+          group_ou_path                 => $group_ou_path,
+          bind_user                     => $bind_user,
+          bind_pass                     => $bind_pass,
+          dc                            => $dc,
+          dyndns_update                 => $dyndns_update,
+          dyndns_refresh_interval       => $dyndns_refresh_interval,
+          dyndns_update_ptr             => $dyndns_update_ptr,
+          dyndns_ttl                    => $dyndns_ttl,
+      }),
       mode    => '0600',
       notify  => Exec['clean_sssd_cache.sh'],
     }
 
-    if $::osfamily == 'RedHat' {
+    if $facts['os']['family'] == 'RedHat' {
       file { '/etc/oddjobd.conf.d/oddjobd-mkhomedir.conf':
         ensure => file,
         source => 'puppet:///modules/central_auth/oddjobd-mkhomedir.conf',
@@ -203,7 +203,7 @@ class central_auth::config (
     }
 
     # Set the authconfig settings to reflect what we are setting - even though authconfig is not being used
-    if $::osfamily == 'RedHat' {
+    if $facts['os']['family'] == 'RedHat' {
       augeas { 'sysconfig-authconfig-sssd':
         context => '/files/etc/sysconfig/authconfig',
         changes => [

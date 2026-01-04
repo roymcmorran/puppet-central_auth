@@ -9,26 +9,26 @@ class central_auth (
   Boolean $manage_pam_files           = true,
 ) {
 
-  case $facts['osfamily'] {
+  case $facts['os']['family'] {
     'Suse': {
-      if Numeric($::operatingsystemmajrelease) < 11 {
-        fail("Wrong SLES version, should be 11 or greater than 11, not ${::operatingsystemmajrelease}")
+      if Numeric($facts['os']['release']['major']) < 11 {
+        fail("Wrong SLES version, should be 11 or greater than 11, not ${facts['os']['release']['major']}")
       }
     }
     'RedHat': {
-      if Numeric($::operatingsystemmajrelease) < 6 and $facts['operatingsystem'] != 'Amazon' {
-        fail("Wrong RedHat version, should be 6 or greater than 6, not ${::operatingsystemmajrelease}")
+      if Numeric($facts['os']['release']['major']) < 6 and $facts['os']['name'] != 'Amazon' {
+        fail("Wrong RedHat version, should be 6 or greater than 6, not ${facts['os']['release']['major']}")
       }
     }
     'Debian': {
-      if Numeric($::operatingsystemmajrelease) < 7 and $facts['operatingsystem'] == 'Debian' {
-        fail("Wrong Debian version, should be 7 or greater than 7, not ${::operatingsystemmajrelease}")
-      } elsif Numeric($::operatingsystemmajrelease) < 12 and $facts['operatingsystem'] == 'Ubuntu' {
-        fail("Wrong Debian version, should be 12 or greater than 12, not ${::operatingsystemmajrelease}")
+      if Numeric($facts['os']['release']['major']) < 7 and $facts['os']['name'] == 'Debian' {
+        fail("Wrong Debian version, should be 7 or greater than 7, not ${facts['os']['release']['major']}")
+      } elsif Numeric($facts['os']['release']['major']) < 12 and $facts['os']['name'] == 'Ubuntu' {
+        fail("Wrong Debian version, should be 12 or greater than 12, not ${facts['os']['release']['major']}")
       }
     }
     default: {
-      fail("Wrong OS Family, should be RedHat, Debian or Suse, not ${::osfamily}")
+      fail("Wrong OS Family, should be RedHat, Debian or Suse, not ${facts['os']['family']}")
     }
   }
 
